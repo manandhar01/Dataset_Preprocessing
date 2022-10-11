@@ -11,4 +11,7 @@ for file in csv_files:
     dataframes.append(df)
 df = pd.concat(dataframes)
 
+# Dropping redundant column "Fwd_Header_Length.1"
+df.drop(["Fwd_Header_Length.1"], axis=1, inplace=True)
+
 df.to_csv(path+"all_combined.csv", index=False)

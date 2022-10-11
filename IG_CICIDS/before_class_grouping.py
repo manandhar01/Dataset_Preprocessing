@@ -3,35 +3,35 @@ import pandas as pd
 
 # Change the path and file to appropriate ones before running.
 path = "../MachineLearningCVE/"
-df = pd.read_csv(path + "all_combined.csv")
+df = pd.read_csv(path + "20percent_of_combined.csv")
 
-# These attributes have only 0 value in all the rows. So, dropping them.
-df.drop(
-    [
-        "Bwd_PSH_Flags",
-        "Bwd_URG_Flags",
-        "Fwd_Avg_Bytes/Bulk",
-        "Fwd_Avg_Packets/Bulk",
-        "Fwd_Avg_Bulk_Rate",
-        "Bwd_Avg_Bytes/Bulk",
-        "Bwd_Avg_Packets/Bulk",
-        "Bwd_Avg_Bulk_Rate",
-    ],
-    axis=1,
-    inplace=True,
-)
+# # These attributes have only 0 value in all the rows. So, dropping them.
+# df.drop(
+#     [
+#         "Bwd_PSH_Flags",
+#         "Bwd_URG_Flags",
+#         "Fwd_Avg_Bytes/Bulk",
+#         "Fwd_Avg_Packets/Bulk",
+#         "Fwd_Avg_Bulk_Rate",
+#         "Bwd_Avg_Bytes/Bulk",
+#         "Bwd_Avg_Packets/Bulk",
+#         "Bwd_Avg_Bulk_Rate",
+#     ],
+#     axis=1,
+#     inplace=True,
+# )
 
-# There are too many attributes and calculating information gain for some of them takes forever
-# because there are a lot of different values in each of the rows. (mostly in the columns with data transfer rates)
-# Therefore this part of the code drops the attributes that have more than 50000 different values.
-# This is not the ideal way to do it.
-# We need to perform some sort of binning.
-# pd.set_option("display.max_rows", None)
-attributes_to_drop = []
-for attribute in df.columns:
-    if len(df[attribute].value_counts()) > 50000:
-        attributes_to_drop.append(attribute)
-df.drop(attributes_to_drop, axis=1, inplace=True)
+# # There are too many attributes and calculating information gain for some of them takes forever
+# # because there are a lot of different values in each of the rows. (mostly in the columns with data transfer rates)
+# # Therefore this part of the code drops the attributes that have more than 50000 different values.
+# # This is not the ideal way to do it.
+# # We need to perform some sort of binning.
+# # pd.set_option("display.max_rows", None)
+# attributes_to_drop = []
+# for attribute in df.columns:
+#     if len(df[attribute].value_counts()) > 50000:
+#         attributes_to_drop.append(attribute)
+# df.drop(attributes_to_drop, axis=1, inplace=True)
 
 
 # Entroppy Calculation
