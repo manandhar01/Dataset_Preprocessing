@@ -1,12 +1,14 @@
 from math import log2
 import pandas as pd
+import threading
 
 
 # Change the path and file to appropriate ones before running.
 path = "../MachineLearningCVE/"
 
 
-df = pd.read_csv(path + "20percent_of_combined.csv")
+df = pd.read_csv(path + "columns_clustered_of_20_percent.csv")
+# df = pd.read_csv(path + "20percent_of_combined.csv")
 
 # Replacing all the values except BENIGN in the Label column to attack.
 df["Label"] = df["Label"].replace(
@@ -55,29 +57,70 @@ for c in classes:
     entropy += entropy_c
 print("Entropy of Dataset::", entropy)
 
+
+
 # Information Gain Calculation
 information_gains = {}
+
+def calculate_information_gain(attribute):
+    values = df[attribute].unique()
+    values_count = df[attribute].value_counts()
+    information_gain = entropy
+    for value in values:
+        entropy_value = 0
+        subdf = df.loc[df[attribute] == value, "Label"]
+        sclasses = subdf.unique()
+        sclasses_count = subdf.value_counts()
+        for sc in sclasses:
+            entropy_sc = -(
+                sclasses_count[sc]
+                / values_count[value]
+                * log2(sclasses_count[sc] / values_count[value])
+            )
+            entropy_value += entropy_sc
+        information_gain -= entropy_value * \
+            (values_count[value] / total_data)
+    information_gains[attribute] = information_gain
+
+threads = []
+print(df)
 for attribute in df.columns:
     if attribute == "Label":
         continue
-    else:
-        values = df[attribute].unique()
-        values_count = df[attribute].value_counts()
-        information_gain = entropy
-        for value in values:
-            entropy_value = 0
-            subdf = df.loc[df[attribute] == value, "Label"]
-            sclasses = subdf.unique()
-            sclasses_count = subdf.value_counts()
-            for sc in sclasses:
-                entropy_sc = -(
-                    sclasses_count[sc]
-                    / values_count[value]
-                    * log2(sclasses_count[sc] / values_count[value])
-                )
-                entropy_value += entropy_sc
-            information_gain -= entropy_value * (values_count[value] / total_data)
-        information_gains[attribute] = information_gain
+    thread = threading.Thread(target=calculate_information_gain, args=(attribute,))
+    thread.start()
+    threads.append(thread)
+
+for thread in threads:
+    thread.join()
+
+
+
+
+
+# # Information Gain Calculation
+# information_gains = {}
+# for attribute in df.columns:
+#     if attribute == "Label":
+#         continue
+#     else:
+#         values = df[attribute].unique()
+#         values_count = df[attribute].value_counts()
+#         information_gain = entropy
+#         for value in values:
+#             entropy_value = 0
+#             subdf = df.loc[df[attribute] == value, "Label"]
+#             sclasses = subdf.unique()
+#             sclasses_count = subdf.value_counts()
+#             for sc in sclasses:
+#                 entropy_sc = -(
+#                     sclasses_count[sc]
+#                     / values_count[value]
+#                     * log2(sclasses_count[sc] / values_count[value])
+#                 )
+#                 entropy_value += entropy_sc
+#             information_gain -= entropy_value * (values_count[value] / total_data)
+#         information_gains[attribute] = information_gain
 
 # Sorting attributes based on information gain values
 sorted_information_gains = dict(
